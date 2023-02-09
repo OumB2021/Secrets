@@ -25,16 +25,19 @@ app.get('/', (req, res) =>{
 });
 
 // Login route
-app.get('/login', (req, res) =>{
+app.route('/login')
+.get((req, res) =>{
   res.render('login')
 });
 
-// Register route
-app.get('/register', (req, res) =>{
-  res.render('register')
-});
+// Register route 
+app.route('/register')
 
-app.post('/register', (req, res) =>{
+.get((req, res) =>{
+  res.render('register')
+})
+
+.post((req, res) =>{
 
   const newUser = new User({
     email : req.body.username,
@@ -43,17 +46,12 @@ app.post('/register', (req, res) =>{
   
   newUser.save((err) =>{
     if (!err) {
-      console.log('User created successfully')
+      res.render('secrets');
     } else {
-      console.log (err.message)
+      console.log (err.message);
     }
   });
 })
-
-// Secret route
-app.get('/secrets', (req, res) =>{
-  res.render('secrets')
-});
 
 // submit route
 app.get('/submit', (req, res) =>{
