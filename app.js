@@ -11,6 +11,14 @@ app.use(express.static('public'));
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/userDB', {useNewUrlParser: true});
 
+const userSchema = {
+  email : String, 
+  password : String
+};
+
+const User = new mongoose.model('User', userSchema);
+
+
 //Home route
 app.get('/', (req, res) =>{
   res.render('home')
@@ -25,6 +33,22 @@ app.get('/login', (req, res) =>{
 app.get('/register', (req, res) =>{
   res.render('register')
 });
+
+app.post('/register', (req, res) =>{
+
+  const newUser = new User({
+    email : req.body.username,
+    password: req.body.password,
+  });
+  
+  newUser.save((err) =>{
+    if (!err) {
+      console.log('User created successfully')
+    } else {
+      console.log (err.message)
+    }
+  });
+})
 
 // Secret route
 app.get('/secrets', (req, res) =>{
