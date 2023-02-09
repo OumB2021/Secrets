@@ -24,12 +24,32 @@ app.get('/', (req, res) =>{
   res.render('home')
 });
 
+//---------------------------------------------------------------------------------------------//
 // Login route
 app.route('/login')
 .get((req, res) =>{
   res.render('login')
+})
+
+.post((req, res) =>{
+  const username = req.body.username;
+  const password = req.body.password;
+
+  User.findOne({email: username}, (err, user) =>{
+    if (err) {
+      res.send("This user does not exist");
+      res.redirect('/login');
+    } else {
+      if(user){
+        if (user.password === password) {
+          res.render('secrets');
+        }
+      }
+    }
+  });
 });
 
+//---------------------------------------------------------------------------------------------//
 // Register route 
 app.route('/register')
 
@@ -52,6 +72,8 @@ app.route('/register')
     }
   });
 })
+
+//---------------------------------------------------------------------------------------------//
 
 // submit route
 app.get('/submit', (req, res) =>{
