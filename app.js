@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const ecrypt = require ('mongoose-encryption');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
