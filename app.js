@@ -12,10 +12,13 @@ app.use(express.static('public'));
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/userDB', {useNewUrlParser: true});
 
-const userSchema = {
+const userSchema = new mongoose.Schema({
   email : String, 
   password : String
-};
+});
+
+const secret = 'Thisismylittlesecretthatnoonehastoknow.';
+userSchema.plugin(encrypt, {secret : secret, encryptedFiels: ['password']});
 
 const User = new mongoose.model('User', userSchema);
 
