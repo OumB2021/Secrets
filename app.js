@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-const ecrypt = require ('mongoose-encryption');
+const encrypt = require ('mongoose-encryption');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema({
   password : String
 });
 
-const secret = 'Thisismylittlesecretthatnoonehastoknow.';
-userSchema.plugin(encrypt, {secret : secret, encryptedFiels: ['password']});
+const secret = 'Thisismylittlesecret.';
+userSchema.plugin(encrypt, { secret : secret, encryptedFields: ['password'] });
 
 const User = new mongoose.model('User', userSchema);
 
@@ -39,18 +39,18 @@ app.route('/login')
   const username = req.body.username;
   const password = req.body.password;
 
-  User.findOne({email: username}, (err, user) =>{
-    if (err) {
-      res.send("This user does not exist");
-      res.redirect('/login');
+  User.findOne({email :username}, function(err, userFound){
+    if (err){
+      console.log(err);
     } else {
-      if(user){
-        if (user.password === password) {
+      if (userFound){
+        console.log (userFound.password);
+        if (userFound.password === password){
           res.render('secrets');
         }
       }
     }
-  });
+  })
 });
 
 //---------------------------------------------------------------------------------------------//
