@@ -19,6 +19,7 @@ app.use(session({
 }));
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/userDB', {useNewUrlParser: true});
@@ -28,8 +29,14 @@ const userSchema = new mongoose.Schema({
   password : String
 });
 
+userSchema.plugin(passportLocalMongoose);
+
 const User = new mongoose.model('User', userSchema);
 
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //Home route
 app.get('/', (req, res) =>{
@@ -57,7 +64,23 @@ app.route('/register')
 
 .post((req, res) =>{
   
+  User.register({username: req.body.username}, req.body.password, (err, user) =>{
+    if (err){
+      console.log(err);
+      res.redirect('/register');
+    } else {
+      passport.authenticate('local')(req, res, ()=>{
+        res.redirect('/secrets');
+      })
+    }
+  })
 })
+
+//---------------------------------------------------------------------------------------------//
+//secrets route
+app.get('/secrets', (req, res) => {
+  res.render('secrets');
+});
 
 //---------------------------------------------------------------------------------------------//
 
