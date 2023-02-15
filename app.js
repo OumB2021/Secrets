@@ -52,6 +52,21 @@ app.route('/login')
 
 .post((req, res) =>{
   
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  req.login(user, (err)=>{
+    
+    if (err){
+      console.log(err);
+    } else {
+      passport.authenticate('local')(req, res, ()=>{
+        res.redirect('/secrets');
+      })
+    }
+  })
 });
 
 //---------------------------------------------------------------------------------------------//
@@ -79,10 +94,28 @@ app.route('/register')
 //---------------------------------------------------------------------------------------------//
 //secrets route
 app.get('/secrets', (req, res) => {
-  res.render('secrets');
+
+  if (req.isAuthenticated()) {
+    res.render('secrets');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //---------------------------------------------------------------------------------------------//
+
+app.get('/logout', function(req, res) {
+
+  req.logout((err)=>{
+
+    if (err){
+      console.log(err);
+    } else {
+      res.redirect('/');
+    }
+  });
+  
+});
 
 // submit route
 app.get('/submit', (req, res) =>{
