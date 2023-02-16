@@ -62,6 +62,11 @@ app.get("/", (req, res) => {
   res.render("home");
 });
 
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile"] })
+);
+
 //---------------------------------------------------------------------------------------------//
 // Login route
 app
