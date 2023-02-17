@@ -40,8 +40,15 @@ const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
 
 passport.use(
   new GoogleStrategy(
@@ -51,20 +58,32 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/google/secrets",
     },
     function (accessToken, refreshToken, profile, cb) {
+      console.log(profile);
       User.findOrCreate({ googleId: profile.id }, function (err, user) {
         return cb(err, user);
       });
     }
   )
 );
+
 //Home route
 app.get("/", (req, res) => {
   res.render("home");
 });
 
+// auth google route
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile"] })
+);
+
+app.get(
+  "/auth/google/secrets",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/secrets");
+  }
 );
 
 //---------------------------------------------------------------------------------------------//
@@ -142,7 +161,11 @@ app.get("/logout", function (req, res) {
 
 // submit route
 app.get("/submit", (req, res) => {
-  res.render("submit");
+  if (req.isAuthenticated()) {
+    res.render("submit");
+  } else {
+    res.redirect("/");
+  }
 });
 
 app.listen(3000, () => {
